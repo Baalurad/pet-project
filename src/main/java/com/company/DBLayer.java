@@ -54,7 +54,7 @@ public class DBLayer {
         return executeQuery("SELECT COUNT(*) FROM " + tableName + " WHERE Name = '" + name + "'").getInt("COUNT(*)");
     }
 
-    public void putPrice(int id, Integer value, long currentTimeMillis) throws SQLException {
+    public static void putPrice(int id, Integer value, long currentTimeMillis) throws SQLException {
         execute(String.format("INSERT INTO %s (Id,Price,DateTime) VALUES(%s,%s,%s)", tablePrice, id, value, currentTimeMillis));
     }
 
