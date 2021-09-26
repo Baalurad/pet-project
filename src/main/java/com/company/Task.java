@@ -1,15 +1,8 @@
 package com.company;
 
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.GetUpdates;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.GetUpdatesResponse;
-import com.pengrad.telegrambot.response.SendResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -23,15 +16,14 @@ import static com.company.PageParser.getPrice;
 import static com.company.Starter.dbLayer;
 
 public class Task extends TimerTask {
-    static Map<String, Integer> rows = new HashMap<>();
+    static Map<String, Integer> fileRows = new HashMap<>();
     private static final String path = "links.txt";
-
 
     @Override
     public void run() {
         try {
             updateBDFromInputFile();
-            //parsePrices();
+            parsePrices();
             Map<String, Integer> needToSend = validatePrices();
             new TeleBot().sendToBot(needToSend);
         } catch (Exception e) {
@@ -46,9 +38,9 @@ public class Task extends TimerTask {
 
 
     private void updateBDFromInputFile() throws IOException, SQLException {
-        if (rows.isEmpty())
-            rows = new FileLoader().parseFile(path);
-        for (Map.Entry<String, Integer> entry : rows.entrySet()) {
+        if (fileRows.isEmpty())
+            fileRows = new FileLoader().parseFile(path);
+        for (Map.Entry<String, Integer> entry : fileRows.entrySet()) {
             String key = entry.getKey();
             Integer value = entry.getValue();
             dbLayer.addNameIfAbsent(key, value);
@@ -56,11 +48,11 @@ public class Task extends TimerTask {
     }
 
     public static void parsePrices() throws IOException, SQLException {
-        if (rows.isEmpty())
-            rows = new FileLoader().parseFile(path);
+        if (fileRows.isEmpty())
+            fileRows = new FileLoader().parseFile(path);
 
         Map<String, Integer> results = new HashMap<>();
-        for (String uri : rows.keySet()) {
+        for (String uri : fileRows.keySet()) {
 
             Document doc = Jsoup.connect(uri).get();
             results.put(getName(doc), getPrice(doc));
@@ -79,7 +71,7 @@ public class Task extends TimerTask {
         for (var id : ids) {
             var lastPrice = dbLayer.selectPrice(id);
             var name = dbLayer.selectName(id);
-            if (lastPrice <= rows.get(name))
+            if (lastPrice <= fileRows.get(name))
                 response.put(name, lastPrice);
         }
         return response;
