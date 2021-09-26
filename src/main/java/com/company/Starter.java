@@ -1,53 +1,17 @@
 package com.company;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static com.company.FileLoader.readFromFile;
-import static com.company.PageParser.getName;
-import static com.company.PageParser.getPrice;
+import java.util.Timer;
 
 public class Starter {
-    static DBLayer dbLayer;
+    public static DBLayer dbLayer;
+    static long period = 1000 * 60; //milliseconds
 
-    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
         dbLayer = new DBLayer();
-        parsePrices();
-
+        //Timer timer = new Timer();
+        //timer.schedule(new Task(), 0, period);
+        new Task().run();
         dbLayer.shutdown();
-    }
-
-
-
-    private static void parsePrices() throws IOException, SQLException {
-        File file = new FileLoader().getFileFromURL("links.txt");
-        List<String> uris = readFromFile(file);
-
-        Map<String, Integer> results = new HashMap<>();
-        int price;
-        String name;
-        for (String uri : uris) {
-            Document doc = Jsoup.connect(uri).get();
-            price = getPrice(doc);
-            name = getName(doc);
-            results.put(name, price);
-        }
-        if (!results.isEmpty()) {
-            for (var entry : results.entrySet()) {
-                int id = dbLayer.addNameIfAbsent(entry.getKey());
-                dbLayer.putPrice(id, entry.getValue(), System.currentTimeMillis());
-            }
-        }
     }
 }
