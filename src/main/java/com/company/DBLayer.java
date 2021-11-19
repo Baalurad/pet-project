@@ -12,6 +12,8 @@ public class DBLayer {
     private static final String dbName = "test.db";
 
     public DBLayer() throws ClassNotFoundException, SQLException {
+        if (connection != null)
+            return;
         Class.forName("org.sqlite.JDBC");
         String path = System.getProperty("user.dir") + "/src/main/resources/";
         connection = DriverManager.getConnection("jdbc:sqlite:" + path + dbName);

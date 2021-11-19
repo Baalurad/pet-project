@@ -9,9 +9,9 @@ public class Starter {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         dbLayer = new DBLayer();
-        //Timer timer = new Timer();
-        //timer.schedule(new Task(), 0, period);
-        new Task().run();
-        dbLayer.shutdown();
+        Timer timer = new Timer();
+        timer.schedule(new Task(), 0, period);
+        //new Task().run();
+        //dbLayer.shutdown();
     }
 }

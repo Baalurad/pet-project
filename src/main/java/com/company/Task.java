@@ -14,7 +14,9 @@ public class Task extends TimerTask {
 
     @Override
     public void run() {
+        System.out.println("New task started at: " + + System.currentTimeMillis());
         try {
+            new DBLayer();
             Map<String, Integer> fileRows = new FileLoader().parseFile(path);
             updateBDFromInputFile(fileRows);
             parsePrices(fileRows);
@@ -28,6 +30,7 @@ public class Task extends TimerTask {
                 ex.printStackTrace();
             }
         }
+        System.out.println("Task completed at: " + System.currentTimeMillis());
     }
 
     private void updateBDFromInputFile(Map<String, Integer> fileRows) throws SQLException {
@@ -44,7 +47,7 @@ public class Task extends TimerTask {
         for (var id : ids) {
             var lastPrice = dbLayer.selectPrice(id);
             var name = dbLayer.selectName(id);
-            if (lastPrice <= fileRows.get(name))
+            if (lastPrice <= fileRows.get(name) && lastPrice != 0)
                 response.put(name, lastPrice);
         }
         return response;
