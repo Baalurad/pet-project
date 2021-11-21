@@ -8,7 +8,5 @@ public class Starter {
     public static void main(String[] args) {
         Timer timer = new Timer();
         timer.schedule(new Task(), 0, period);
-        //new Task().run();
-        //dbLayer.shutdown();
     }
 }

@@ -10,17 +10,22 @@ import java.util.List;
 import java.util.Map;
 
 public class TeleBot {
-    TelegramBot bot;
+    static TelegramBot bot;
     private static final long myChatId = 659027810;
     private static final long sunnyChatId = 659027810;
 
-    TeleBot() throws IOException {
+    private TeleBot() {
+    }
+
+    public static void init() throws IOException {
+        if (bot != null)
+            return;
         File file = new FileLoader().getFileFromURL("teleToken.txt");
         List<String> rows = FileLoader.readFromFile(file);
         bot = new TelegramBot(rows.get(0));
     }
 
-    void sendToBot(String text) throws IOException {
+    public static void sendToBot(String text) throws IOException {
         /*
         GetUpdates getUpdates = new GetUpdates().limit(100).offset(0).timeout(0);
         GetUpdatesResponse updatesResponse = bot.execute(getUpdates);
@@ -29,7 +34,7 @@ public class TeleBot {
         SendResponse sendResponse = bot.execute(new SendMessage(myChatId, text));
     }
 
-    void sendToBot(Map<String, Integer> map) throws IOException {
+    static void sendToBot(Map<String, Integer> map) throws IOException {
         if (!map.isEmpty())
             for (Map.Entry<String, Integer> entry : map.entrySet()) {
                 sendToBot(entry.getKey() + " " + entry.getValue() + "руб!");

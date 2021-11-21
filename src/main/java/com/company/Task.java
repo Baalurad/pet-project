@@ -20,7 +20,8 @@ public class Task extends TimerTask {
             updateBDFromInputFile(fileRows);
             parsePrices(fileRows);
             Map<String, Integer> needToSend = validatePrices(fileRows);
-            new TeleBot().sendToBot(needToSend);
+            TeleBot.init();
+            TeleBot.sendToBot(needToSend);
         } catch (Exception e) {
             e.printStackTrace();
             try {
