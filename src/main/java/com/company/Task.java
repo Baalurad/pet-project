@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TimerTask;
 
 import static com.company.PageParser.parsePrices;
-import static com.company.Starter.dbLayer;
 
 public class Task extends TimerTask {
     private static final String path = "links.txt";
@@ -16,7 +15,7 @@ public class Task extends TimerTask {
     public void run() {
         System.out.println("New task started at: " + + System.currentTimeMillis());
         try {
-            new DBLayer();
+            DBLayer.connectToDb();
             Map<String, Integer> fileRows = new FileLoader().parseFile(path);
             updateBDFromInputFile(fileRows);
             parsePrices(fileRows);
@@ -25,7 +24,7 @@ public class Task extends TimerTask {
         } catch (Exception e) {
             e.printStackTrace();
             try {
-                dbLayer.shutdown();
+                DBLayer.shutdown();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -42,11 +41,11 @@ public class Task extends TimerTask {
     }
 
     private Map<String, Integer> validatePrices(Map<String, Integer> fileRows) throws SQLException {
-        List<Integer> ids = dbLayer.selectAllIds();
+        List<Integer> ids = DBLayer.selectAllIds();
         Map<String, Integer> response = new HashMap<>();
         for (var id : ids) {
-            var lastPrice = dbLayer.selectPrice(id);
-            var name = dbLayer.selectName(id);
+            var lastPrice = DBLayer.selectPrice(id);
+            var name = DBLayer.selectName(id);
             if (lastPrice <= fileRows.get(name) && lastPrice != 0)
                 response.put(name, lastPrice);
         }

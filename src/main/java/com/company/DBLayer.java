@@ -3,7 +3,6 @@ package com.company;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class DBLayer {
     private static Connection connection;
@@ -11,7 +10,7 @@ public class DBLayer {
     private static final String tablePrice = "Prices";
     private static final String dbName = "test.db";
 
-    public DBLayer() throws ClassNotFoundException, SQLException {
+    private DBLayer() throws ClassNotFoundException, SQLException {
         if (connection != null)
             return;
         Class.forName("org.sqlite.JDBC");
@@ -19,15 +18,17 @@ public class DBLayer {
         connection = DriverManager.getConnection("jdbc:sqlite:" + path + dbName);
     }
 
-    public void connectToDb() throws ClassNotFoundException, SQLException {
-        if (connection != null)
+    public static void connectToDb() throws ClassNotFoundException, SQLException {
+        if (connection != null && !connection.isClosed())
             return;
         Class.forName("org.sqlite.JDBC");
-        String path = Objects.requireNonNull(this.getClass().getClassLoader().getResource("test.db")).getPath();
-        connection = DriverManager.getConnection("jdbc:sqlite:" + path);
+        String path = System.getProperty("user.dir") + "/src/main/resources/";
+        connection = DriverManager.getConnection("jdbc:sqlite:" + path + dbName);
+        //String path = Objects.requireNonNull(this.getClass().getClassLoader().getResource("test.db")).getPath();
+        //connection = DriverManager.getConnection("jdbc:sqlite:" + path);
     }
 
-    public void shutdown() throws SQLException {
+    public static void shutdown() throws SQLException {
         connection.close();
     }
 
@@ -60,7 +61,7 @@ public class DBLayer {
         execute(String.format("INSERT INTO %s (Id,Price,DateTime) VALUES(%s,%s,%s)", tablePrice, id, value, currentTimeMillis));
     }
 
-    public List<Integer> selectAllIds() throws SQLException {
+    public static List<Integer> selectAllIds() throws SQLException {
         List<Integer> response = new ArrayList<>();
         ResultSet resultSet = executeQuery("SELECT * FROM " + tableName);
         while (resultSet.next())
@@ -68,12 +69,12 @@ public class DBLayer {
         return response;
     }
 
-    public int selectPrice(Integer id) throws SQLException {
+    public static int selectPrice(Integer id) throws SQLException {
         ResultSet resultSet = executeQuery(String.format("SELECT * FROM %s WHERE Id = %s ORDER BY DateTime DESC", tablePrice, id));
         return resultSet.getInt("Price");
     }
 
-    public String selectName(Integer id) throws SQLException {
+    public static String selectName(Integer id) throws SQLException {
         ResultSet resultSet = executeQuery(String.format("SELECT * FROM %s WHERE Id = %s", tableName, id));
         return resultSet.getString("Name");
     }
